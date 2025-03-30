@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Monitor -->
+    <rect x="100" y="80" width="200" height="140" rx="10" fill="#2D2640" stroke="#892CDC" stroke-width="4"/>
+    <rect x="120" y="100" width="160" height="100" rx="4" fill="#1A1625"/>
+    <circle cx="200" cy="140" r="15" fill="#892CDC" opacity="0.6"/>
+    <path d="M190 140 L200 150 L210 130" stroke="#fff" stroke-width="3"/>
+    
+    <!-- Stand -->
+    <rect x="180" y="220" width="40" height="60" fill="#2D2640"/>
+    <rect x="160" y="280" width="80" height="10" rx="5" fill="#2D2640"/>
+    
+    <!-- Desk -->
+    <rect x="60" y="290" width="280" height="20" rx="10" fill="#892CDC" opacity="0.3"/>
+    
+    <!-- Person -->
+    <circle cx="200" cy="200" r="20" fill="#892CDC"/> <!-- Head -->
+    <path d="M200 220 L200 280 M180 240 L220 240 M200 280 L180 320 M200 280 L220 320" 
+          stroke="#892CDC" stroke-width="4"/> <!-- Body and legs -->
+    <path d="M180 240 L160 260 M220 240 L240 260" 
+          stroke="#892CDC" stroke-width="4"/> <!-- Arms -->
+    
+    <!-- Keyboard -->
+    <rect x="160" y="260" width="80" height="20" rx="4" fill="#2D2640"/>
+    
+    <!-- Mouse -->
+    <rect x="250" y="260" width="20" height="30" rx="10" fill="#2D2640"/>
+    
+    <!-- Screen Elements -->
+    <rect x="140" y="120" width="40" height="6" rx="3" fill="#892CDC" opacity="0.6"/>
+    <rect x="140" y="134" width="60" height="6" rx="3" fill="#892CDC" opacity="0.4"/>
+    <rect x="140" y="148" width="50" height="6" rx="3" fill="#892CDC" opacity="0.3"/>
+    
+    <!-- Decorative Elements -->
+    <circle cx="140" cy="180" r="4" fill="#892CDC" opacity="0.5"/>
+    <circle cx="155" cy="180" r="4" fill="#892CDC" opacity="0.3"/>
+    <circle cx="170" cy="180" r="4" fill="#892CDC" opacity="0.4"/>
+</svg>
