@@ -9,6 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt 
 from tensorflow.keras.models import load_model 
 from database import supabase
+import google.generativeai as genai
+
 import os
 
 cv2.namedWindow('Drowsiness Detector', cv2.WINDOW_NORMAL)
@@ -26,6 +28,8 @@ class DrowsinessDetector:
         self.attentive_frames = {}  # Dictionary to store attentive frames for each tracker ID
         self.track_photos = {}  # Dictionary to store a photo of each unique track ID
         self.total_frames = 0
+        self.llmdict = {}  # Dictionary to store attention percentages for each student ID
+        self.api_key = "AIzaSyD_Jn-NVaPZ4uAOzEgvUc2q08DFLnqwEIk"  # Replace with your actual API key
 
     def fetch_video_from_supabase(self):
         try:
@@ -234,6 +238,30 @@ class DrowsinessDetector:
         return frame
     
     
+    def load_gemini_model(self):
+        genai.configure(api_key=self.api_key)
+        return genai.GenerativeModel("gemini-1.5-pro-latest")
+
+    def generate_response(self, model, prompt_main, performance_data):
+        input_text = f"{prompt_main}\n{performance_data}\nChatbot:"  
+        
+        try:
+            response = model.generate_content(input_text)
+            chatbot_reply = response.text.strip()
+        except Exception as e:
+            chatbot_reply = "Sorry, I encountered an error. Please try again later."
+        
+        return chatbot_reply
+
+
+    def chat(self):
+        model = self.load_gemini_model()
+        prompt_main = "You are an educational chatbot analyzing student engagement and providing improvement recommendations."
+        response = self.generate_response(model, prompt_main, str(self.llmdict))
+        print(f"Chatbot: {response}\n")  
+
+        
+    
     def calculate_classroom_performance(self):
         total_students = len(self.attentive_frames)
         if total_students == 0:
@@ -256,7 +284,7 @@ class DrowsinessDetector:
         classroom_average_attention = round(classroom_attention_sum / total_students,2)
         print(f"\nClassroom Average Attention: {classroom_average_attention:.2f}%")
         self.llmdict["Classroom Average Attention"] = classroom_average_attention
-
+        print("llmdict:", self.llmdict)
 
         # Classify classroom engagement
         if classroom_average_attention >= 80:
@@ -265,7 +293,7 @@ class DrowsinessDetector:
             print("Classroom Engagement: Moderately Engaged")
         else:
             print("Classroom Engagement: Low Engagement")
-        
+        self.chat()
         
 
     def detect_and_track(self):
