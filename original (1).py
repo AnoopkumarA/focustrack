@@ -1,21 +1,16 @@
 import cv2
-import cvzone
 import requests
-import torch
 from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
 import math
 import numpy as np
-import matplotlib.pyplot as plt 
 from tensorflow.keras.models import load_model 
 from database import supabase
-import google.generativeai as genai
+from chatbot import ChatBot
 
 import os
 
 cv2.namedWindow('Drowsiness Detector', cv2.WINDOW_NORMAL)
-
-
 
 
 class DrowsinessDetector:
@@ -236,31 +231,7 @@ class DrowsinessDetector:
                 # cv2.putText(frame, f'ID: {track_id} {prediction}', (x1, y1 - 10), 
                 #             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)            
         return frame
-    
-    
-    def load_gemini_model(self):
-        genai.configure(api_key=self.api_key)
-        return genai.GenerativeModel("gemini-1.5-pro-latest")
 
-    def generate_response(self, model, prompt_main, performance_data):
-        input_text = f"{prompt_main}\n{performance_data}\nChatbot:"  
-        
-        try:
-            response = model.generate_content(input_text)
-            chatbot_reply = response.text.strip()
-        except Exception as e:
-            chatbot_reply = "Sorry, I encountered an error. Please try again later."
-        
-        return chatbot_reply
-
-
-    def chat(self):
-        model = self.load_gemini_model()
-        prompt_main = "You are an educational chatbot analyzing student engagement and providing improvement recommendations."
-        response = self.generate_response(model, prompt_main, str(self.llmdict))
-        print(f"Chatbot: {response}\n")  
-
-        
     
     def calculate_classroom_performance(self):
         total_students = len(self.attentive_frames)
@@ -286,15 +257,10 @@ class DrowsinessDetector:
         self.llmdict["Classroom Average Attention"] = classroom_average_attention
         print("llmdict:", self.llmdict)
 
-        # Classify classroom engagement
-        if classroom_average_attention >= 80:
-            print("Classroom Engagement: Highly Engaged")
-        elif classroom_average_attention >= 50:
-            print("Classroom Engagement: Moderately Engaged")
-        else:
-            print("Classroom Engagement: Low Engagement")
-        self.chat()
-        
+        #Accessing chatbot
+        geminiModel = ChatBot(self.llmdict)
+        geminiModel.chat()
+
 
     def detect_and_track(self):
         frame_counter = 0
@@ -330,4 +296,4 @@ class DrowsinessDetector:
 if __name__ == "__main__":
     detector = DrowsinessDetector(yolov8_model_path='yolov8l.pt', vgg16_model_path='Student_attentive_25epsv2.h5')
     detector.detect_and_track()
-    detector.release_resources() 
+    detector.release_resources()
