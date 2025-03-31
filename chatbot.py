@@ -1,12 +1,15 @@
 import google.generativeai as genai
+from tensorflow.python.keras.constraints import nonneg
+
 from database import supabase
 from datetime import datetime
 
 
 class ChatBot:
-    def __init__(self, llmdict):
+    def __init__(self, llmdict, first_student_number):
         self.llmdict = llmdict
         self.api_key = "AIzaSyD_Jn-NVaPZ4uAOzEgvUc2q08DFLnqwEIk"  # Replace with your actual API key
+        self.first_student_number = first_student_number
 
 
     def load_gemini_model(self):
@@ -49,10 +52,21 @@ class ChatBot:
     def save_to_database(self, chatbot_reply):
         try:
             data = {
-                "response": chatbot_reply
+                "chatbot_response": chatbot_reply
             }
-            res = supabase.table("chatbot_response").insert(data).execute()
-            print("Response saved to database successfully!")
+
+            res = supabase.table("students").update(data).eq("st_id", self.first_student_number).execute()
+
+            if res.data:
+                print("Response saved to database successfully!")
+            else:
+                print("Failed to update response in database.")
         except Exception as e:
             print(f"Error saving to database: {e}")
 
+
+
+if __name__ == "__main__":
+    # gemini = ChatBot(llmdict=None, first_student_number=10)
+    # gemini.save_to_database("HI")
+    save_to_database("HI")

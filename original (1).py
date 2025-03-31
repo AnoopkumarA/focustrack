@@ -7,7 +7,6 @@ import numpy as np
 from tensorflow.keras.models import load_model 
 from database import supabase
 from chatbot import ChatBot
-
 import os
 
 cv2.namedWindow('Drowsiness Detector', cv2.WINDOW_NORMAL)
@@ -25,6 +24,7 @@ class DrowsinessDetector:
         self.total_frames = 0
         self.llmdict = {}  # Dictionary to store attention percentages for each student ID
         self.api_key = "AIzaSyD_Jn-NVaPZ4uAOzEgvUc2q08DFLnqwEIk"  # Replace with your actual API key
+        self.first_student_number = self.get_next_student_number()
 
     def fetch_video_from_supabase(self):
         try:
@@ -249,7 +249,7 @@ class DrowsinessDetector:
             self.llmdict[track_id] = attention_percentage
             
             print(f"Student ID: {track_id}")
-            print(f"  Attention Percentage: {attention_percentage:.2f}%")
+            print(f"Attention Percentage: {attention_percentage:.2f}%")
 
         # Calculate the average attention percentage for the classroom
         classroom_average_attention = round(classroom_attention_sum / total_students,2)
@@ -257,8 +257,8 @@ class DrowsinessDetector:
         self.llmdict["Classroom Average Attention"] = classroom_average_attention
         print("llmdict:", self.llmdict)
 
-        #Accessing chatbot
-        geminiModel = ChatBot(self.llmdict)
+        # Accessing chatbot
+        geminiModel = ChatBot(self.llmdict, self.first_student_number)
         geminiModel.chat()
 
 
@@ -281,10 +281,11 @@ class DrowsinessDetector:
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-            
+
         self.save_to_database()
         self.calculate_classroom_performance()
-        
+
+
 
 
     def release_resources(self):
