@@ -13,7 +13,7 @@ const NewAnalysis = () => {
   const [recentAnalysis, setRecentAnalysis] = useState<any[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingTimeout, setProcessingTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [countdown, setCountdown] = useState(31);
+  const [countdown, setCountdown] = useState(300);
   const [averageAttention, setAverageAttention] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -99,7 +99,7 @@ const NewAnalysis = () => {
     try {
       setUploading(true);
       setIsProcessing(true);
-      setCountdown(31);
+      setCountdown(300);
 
       // Clear any existing timeout
       if (processingTimeout) {
@@ -167,11 +167,11 @@ const NewAnalysis = () => {
         });
       }, 1000);
 
-      // Set timeout to fetch results after 31 seconds
+      // Set timeout to fetch results after 300 seconds
       const timeout = setTimeout(() => {
         fetchRecentAnalysis();
         clearInterval(countdownInterval);
-      }, 31000);
+      }, 300000);
       
       setProcessingTimeout(timeout);
 
@@ -192,7 +192,7 @@ const NewAnalysis = () => {
     try {
       setUploading(true);
       setIsProcessing(true);
-      setCountdown(31);
+      setCountdown(300);
       const file = e.dataTransfer.files[0];
       if (!file) return;
 
@@ -262,11 +262,11 @@ const NewAnalysis = () => {
         });
       }, 1000);
 
-      // Set timeout to fetch results after 31 seconds
+      // Set timeout to fetch results after 300 seconds
       const timeout = setTimeout(() => {
         fetchRecentAnalysis();
         clearInterval(countdownInterval);
-      }, 31000);
+      }, 300000);
       
       setProcessingTimeout(timeout);
 
@@ -316,7 +316,7 @@ const NewAnalysis = () => {
                 <div
                   className={`relative border-2 border-dashed rounded-xl p-8 text-center 
                     ${uploading ? 'border-purple-500 bg-purple-500/5' : 'border-gray-700 hover:border-purple-500 hover:bg-purple-500/5'} 
-                    transition-all duration-31 cursor-pointer min-h-[200px] flex flex-col items-center justify-center`}
+                    transition-all duration-300 cursor-pointer min-h-[200px] flex flex-col items-center justify-center`}
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                 >
@@ -342,7 +342,7 @@ const NewAnalysis = () => {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 
-                          transition-colors duration-31 flex items-center space-x-2 shadow-lg"
+                          transition-colors duration-300 flex items-center space-x-2 shadow-lg"
                         disabled={uploading}
                       >
                         <Upload className="w-4 h-4" />
