@@ -13,7 +13,7 @@ const NewAnalysis = () => {
   const [recentAnalysis, setRecentAnalysis] = useState<any[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingTimeout, setProcessingTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [countdown, setCountdown] = useState(300);
+  const [countdown, setCountdown] = useState(31);
   const [averageAttention, setAverageAttention] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -41,7 +41,7 @@ const NewAnalysis = () => {
       // Then fetch all results ordered by time
       const { data: studentsData, error: studentsError } = await supabase
         .from('students')
-        .select('st_id, image, attention_percentage, created_at')
+        .select('st_id, image, attention_percentage, created_at, chatbot_response')
         .order('created_at', { ascending: false });
 
       if (studentsError) throw studentsError;
@@ -99,7 +99,7 @@ const NewAnalysis = () => {
     try {
       setUploading(true);
       setIsProcessing(true);
-      setCountdown(300);
+      setCountdown(31);
 
       // Clear any existing timeout
       if (processingTimeout) {
@@ -167,11 +167,11 @@ const NewAnalysis = () => {
         });
       }, 1000);
 
-      // Set timeout to fetch results after 300 seconds
+      // Set timeout to fetch results after 31 seconds
       const timeout = setTimeout(() => {
         fetchRecentAnalysis();
         clearInterval(countdownInterval);
-      }, 300000);
+      }, 31000);
       
       setProcessingTimeout(timeout);
 
@@ -192,7 +192,7 @@ const NewAnalysis = () => {
     try {
       setUploading(true);
       setIsProcessing(true);
-      setCountdown(300);
+      setCountdown(31);
       const file = e.dataTransfer.files[0];
       if (!file) return;
 
@@ -262,11 +262,11 @@ const NewAnalysis = () => {
         });
       }, 1000);
 
-      // Set timeout to fetch results after 300 seconds
+      // Set timeout to fetch results after 31 seconds
       const timeout = setTimeout(() => {
         fetchRecentAnalysis();
         clearInterval(countdownInterval);
-      }, 300000);
+      }, 31000);
       
       setProcessingTimeout(timeout);
 
@@ -316,7 +316,7 @@ const NewAnalysis = () => {
                 <div
                   className={`relative border-2 border-dashed rounded-xl p-8 text-center 
                     ${uploading ? 'border-purple-500 bg-purple-500/5' : 'border-gray-700 hover:border-purple-500 hover:bg-purple-500/5'} 
-                    transition-all duration-300 cursor-pointer min-h-[200px] flex flex-col items-center justify-center`}
+                    transition-all duration-31 cursor-pointer min-h-[200px] flex flex-col items-center justify-center`}
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                 >
@@ -342,7 +342,7 @@ const NewAnalysis = () => {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 
-                          transition-colors duration-300 flex items-center space-x-2 shadow-lg"
+                          transition-colors duration-31 flex items-center space-x-2 shadow-lg"
                         disabled={uploading}
                       >
                         <Upload className="w-4 h-4" />
@@ -470,6 +470,7 @@ const NewAnalysis = () => {
                             style={{ width: `${Math.min(100, Math.max(0, result.attention_percentage || 0))}%` }}
                           />
                         </div>
+                        
                       </div>
                     </div>
                   ))}
@@ -480,8 +481,9 @@ const NewAnalysis = () => {
 
           {/* Sticky Average Score Section */}
           {averageAttention !== null && recentAnalysis.length > 0 && (
-            <div className="lg:w-80">
-              <div className="sticky top-4">
+            <div className="lg:w-80 space-y-4">
+              <div className="sticky top-4 space-y-4">
+                {/* Average Score Box */}
                 <div className="bg-[#2d2640] rounded-lg p-6 shadow-lg">
                   <h4 className="text-xl font-bold text-white mb-4">Average Attention Score</h4>
                   <div className="text-4xl font-bold text-white mb-4">
@@ -504,6 +506,50 @@ const NewAnalysis = () => {
                         minute: '2-digit'
                       })}
                     </p>
+                  </div>
+                </div>
+
+                {/* AI Analysis Responses Section */}
+                <div className="bg-[#2d2640] rounded-lg p-6 h-[30rem] shadow-lg">
+                  <h4 className="text-xl font-bold text-white mb-4 flex items-center">
+                    <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                    AI Analysis Responses
+                  </h4>
+                  <div className="space-y-4 max-h-[calc(121vh-500px)] overflow-y-auto pr-1
+                    [&::-webkit-scrollbar]:w-1
+                    [&::-webkit-scrollbar-track]:bg-[#1a1625]
+                    [&::-webkit-scrollbar-thumb]:bg-red-500
+                    [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb:hover]:bg-red-600">
+                    {recentAnalysis.map((result, index) => (
+                      result.chatbot_response && (
+                        <div key={index} className="bg-[#1a1625] rounded-lg p-4 border border-gray-700/50 hover:border-purple-500/30 transition-all duration-300">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-white font-medium flex items-center">
+                              <span className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2"></span>
+                              Student {result.st_id}
+                            </span>
+                            <span className="text-sm text-gray-400 bg-[#2d2640] px-2 py-1 rounded">
+                              {new Date(result.created_at).toLocaleTimeString('en-US', {
+                                hour12: false,
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                          <div className="text-gray-300 text-sm space-y-2 pl-3">
+                            {result.chatbot_response.split('\n').map((line, i) => (
+                              line.trim() && (
+                                <div key={i} className="flex items-start space-x-2 group">
+                                  <span className="text-purple-400 mt-1 group-hover:text-purple-300 transition-colors duration-200">•</span>
+                                  <p className="leading-relaxed group-hover:text-white transition-colors duration-200">{line.trim()}</p>
+                                </div>
+                              )
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    ))}
                   </div>
                 </div>
               </div>

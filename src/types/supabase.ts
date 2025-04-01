@@ -12,4 +12,5 @@ export interface Student {
   attention_percentage: number;
   image: string | null;
   video_title?: string;
+  chatbot_response?: string | null;
 }

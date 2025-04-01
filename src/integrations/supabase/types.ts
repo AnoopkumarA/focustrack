@@ -36,18 +36,21 @@ export type Database = {
           created_at: string
           image: string | null
           st_id: string
+          chatbot_response: string | null
         }
         Insert: {
           attention_percentage?: number | null
           created_at?: string
           image?: string | null
           st_id: string
+          chatbot_response?: string | null
         }
         Update: {
           attention_percentage?: number | null
           created_at?: string
           image?: string | null
           st_id?: string
+          chatbot_response?: string | null
         }
         Relationships: []
       }
