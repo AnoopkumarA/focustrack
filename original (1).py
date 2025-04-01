@@ -1,19 +1,15 @@
 import cv2
-import cvzone
 import requests
-import torch
 from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
 import math
 import numpy as np
-import matplotlib.pyplot as plt 
 from tensorflow.keras.models import load_model 
 from database import supabase
+from chatbot import ChatBot
 import os
 
 cv2.namedWindow('Drowsiness Detector', cv2.WINDOW_NORMAL)
-
-
 
 
 class DrowsinessDetector:
@@ -26,6 +22,9 @@ class DrowsinessDetector:
         self.attentive_frames = {}  # Dictionary to store attentive frames for each tracker ID
         self.track_photos = {}  # Dictionary to store a photo of each unique track ID
         self.total_frames = 0
+        self.llmdict = {}  # Dictionary to store attention percentages for each student ID
+        self.api_key = "AIzaSyD_Jn-NVaPZ4uAOzEgvUc2q08DFLnqwEIk"  # Replace with your actual API key
+        self.first_student_number = self.get_next_student_number()
 
     def fetch_video_from_supabase(self):
         try:
@@ -232,7 +231,7 @@ class DrowsinessDetector:
                 # cv2.putText(frame, f'ID: {track_id} {prediction}', (x1, y1 - 10), 
                 #             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)            
         return frame
-    
+
     
     def calculate_classroom_performance(self):
         total_students = len(self.attentive_frames)
@@ -250,23 +249,18 @@ class DrowsinessDetector:
             self.llmdict[track_id] = attention_percentage
             
             print(f"Student ID: {track_id}")
-            print(f"  Attention Percentage: {attention_percentage:.2f}%")
+            print(f"Attention Percentage: {attention_percentage:.2f}%")
 
         # Calculate the average attention percentage for the classroom
         classroom_average_attention = round(classroom_attention_sum / total_students,2)
         print(f"\nClassroom Average Attention: {classroom_average_attention:.2f}%")
         self.llmdict["Classroom Average Attention"] = classroom_average_attention
+        print("llmdict:", self.llmdict)
 
+        # Accessing chatbot
+        geminiModel = ChatBot(self.llmdict, self.first_student_number)
+        geminiModel.chat()
 
-        # Classify classroom engagement
-        if classroom_average_attention >= 80:
-            print("Classroom Engagement: Highly Engaged")
-        elif classroom_average_attention >= 50:
-            print("Classroom Engagement: Moderately Engaged")
-        else:
-            print("Classroom Engagement: Low Engagement")
-        
-        
 
     def detect_and_track(self):
         frame_counter = 0
@@ -287,10 +281,11 @@ class DrowsinessDetector:
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-            
+
         self.save_to_database()
         self.calculate_classroom_performance()
-        
+
+
 
 
     def release_resources(self):
@@ -302,4 +297,4 @@ class DrowsinessDetector:
 if __name__ == "__main__":
     detector = DrowsinessDetector(yolov8_model_path='yolov8l.pt', vgg16_model_path='Student_attentive_25epsv2.h5')
     detector.detect_and_track()
-    detector.release_resources() 
+    detector.release_resources()
