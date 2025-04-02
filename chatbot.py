@@ -32,9 +32,12 @@ class ChatBot:
                     top_k=40
                 )
             )
-            chatbot_reply = response.text.strip()
+            if hasattr(response, "text") and response.text:
+                chatbot_reply = response.text.strip()
+            else:
+                chatbot_reply = "Chatbot encountered an unexpected response format."
         except Exception as e:
-            chatbot_reply = "Sorry, I encountered an error. Please try again later."
+            chatbot_reply = f"Sorry, I encountered an error: {str(e)}"
 
         return chatbot_reply
 
@@ -67,6 +70,10 @@ class ChatBot:
 
 
 if __name__ == "__main__":
-    # gemini = ChatBot(llmdict=None, first_student_number=10)
-    # gemini.save_to_database("HI")
-    save_to_database("HI")
+    llmdict ={89: {'attention_percentage': 11.43}, 90: {'attention_percentage': 11.43},
+              91: {'attention_percentage': 57.14}, 92: {'attention_percentage': 34.29},
+              93: {'attention_percentage': 57.14}, 94: {'attention_percentage': 57.14},
+              95: {'attention_percentage': 34.29}, 'Classroom Average Attention': 37.55}
+
+    gemini = ChatBot(llmdict, 1)
+    gemini.chat()
