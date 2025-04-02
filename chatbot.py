@@ -41,7 +41,7 @@ class ChatBot:
 
     def chat(self):
         model = self.load_gemini_model()
-        prompt_main = "You are an educational chatbot analyzing student engagement and providing improvement recommendations by analyzing each student and the overall class attention percentage."
+        prompt_main = "You are an educational chatbot analyzing student engagement and providing improvement recommendations by analyzing the attention percentage of each student and the overall class attention percentage."
         response = self.generate_response(model, prompt_main, str(self.llmdict))
         print(f"Chatbot: {response}\n")
 

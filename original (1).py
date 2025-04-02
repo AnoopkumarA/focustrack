@@ -190,6 +190,10 @@ class DrowsinessDetector:
                         }
                         response = supabase.table("students").insert(data).execute()
                         print(f"Saved to database: {data}")
+                        # Store student data in llmdict
+                        self.llmdict[student_id] = {
+                            "attention_percentage": attention_percentage
+                        }
                         next_student_number += 1  # Increment for the next student
         except Exception as e:
             print(f"Error saving to database: {e}")
@@ -245,8 +249,6 @@ class DrowsinessDetector:
         for track_id, attentive_count in self.attentive_frames.items():
             attention_percentage = self.calculate_attention_percentage(attentive_count)
             classroom_attention_sum += attention_percentage
-
-            self.llmdict[track_id] = attention_percentage
             
             print(f"Student ID: {track_id}")
             print(f"Attention Percentage: {attention_percentage:.2f}%")
